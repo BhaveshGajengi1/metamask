@@ -1,0 +1,15 @@
+name: autopilot-indexer
+networks:
+- id: 31337 # Localhost / Hardhat
+  rpc_config:
+    url: http://localhost:8545
+  start_block: 0
+  contracts:
+  - name: AutoPilotDeFi
+    address: "0x5FbDB2315678afecb367f032d93F642f64180aa3" # Default Hardhat deployment address
+    handler: src/EventHandlers.ts
+    events:
+    - event: ConfigUpdated(address indexed user, uint256 spendingCap, uint256 slippageLimit)
+    - event: RebalanceExecuted(address indexed user, address tokenIn, address tokenOut, uint256 amountIn, uint256 amountOut)
+    - event: Paused(address indexed user)
+    - event: Unpaused(address indexed user)

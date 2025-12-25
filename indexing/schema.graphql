@@ -1,0 +1,18 @@
+type UserConfig {
+  id: ID!
+  user: Bytes!
+  spendingCap: BigInt!
+  slippageLimit: BigInt!
+  isPaused: Boolean!
+}
+
+type RebalanceAction {
+  id: ID!
+  user: Bytes!
+  tokenIn: Bytes!
+  tokenOut: Bytes!
+  amountIn: BigInt!
+  amountOut: BigInt!
+  blockNumber: Int!
+  timestamp: Int!
+}
