@@ -228,10 +228,11 @@ Visit `http://localhost:5173` 🎉
 
 ## 🔗 Links
 
-- **Live Demo**: https://frontend-1awu81t33-bhavesh-gajengis-projects.vercel.app
-- **Video Demo**: [Coming Soon]
-- **Sepolia Contract**: [Update after deployment]
-- **Envio Dashboard**: [Update after deployment]
+- **Live Demo**: https://frontend-nkis74ltl-bhavesh-gajengis-projects.vercel.app
+- **Backend API**: https://autopilot-defi-backend.onrender.com
+- **Smart Contract (Sepolia)**: 0x809a0C681747b257704EEa0E551544ca2C7061248
+- **Etherscan**: https://sepolia.etherscan.io/address/0x809a0C681747b257704EEa0E551544ca2C7061248
+- **GitHub Repository**: https://github.com/BhaveshGajengi1/metamask
 
 ## 👥 Team
 

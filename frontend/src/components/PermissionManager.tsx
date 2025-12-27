@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useWallet } from '../contexts/WalletContext';
 import { useToast } from './ToastContainer';
-import { getPermissionStatus } from '../utils/mockData';
+import { smartAccountManager } from '../lib/smartAccount';
 
 const PermissionManager: React.FC = () => {
-  const { userAddress } = useWallet();
+  const { userAddress, provider } = useWallet();
   const { showToast } = useToast();
 
   const [spendingCap, setSpendingCap] = useState(5000);
@@ -15,52 +15,86 @@ const PermissionManager: React.FC = () => {
 
   useEffect(() => {
     if (userAddress) {
-      // Load mock permission status
-      setPermissionStatus(getPermissionStatus());
+      loadPermissionStatus();
     }
   }, [userAddress]);
 
-  const handleGrant = async () => {
-    setLoading(true);
-    showToast('info', '🔐 Granting permission...', 2000);
+  const loadPermissionStatus = async () => {
+    try {
+      await smartAccountManager.connect();
+      const permission = await smartAccountManager.getPermission(userAddress!);
 
-    setTimeout(() => {
-      const newPermission = {
-        isActive: true,
-        isPaused: false,
-        spendingCap: spendingCap,
-        spentThisMonth: 0,
-        expiresAt: Date.now() + (duration * 24 * 60 * 60 * 1000),
-        grantedAt: Date.now(),
-      };
-      setPermissionStatus(newPermission);
+      if (permission.active) {
+        setPermissionStatus({
+          isActive: permission.active,
+          isPaused: false,
+          spendingCap: Number(permission.spendingCap) / 1e6, // Convert from USDC decimals
+          spentThisMonth: Number(permission.spent) / 1e6,
+          expiresAt: Number(permission.expiry) * 1000,
+          grantedAt: Number(permission.grantedAt) * 1000,
+        });
+      }
+    } catch (error) {
+      console.error('Error loading permission:', error);
+    }
+  };
+
+  const handleGrant = async () => {
+    try {
+      setLoading(true);
+      showToast('info', '🔐 Requesting permission... Check MetaMask!', 3000);
+
+      await smartAccountManager.connect();
+      const txHash = await smartAccountManager.grantPermission(spendingCap, duration);
+
+      showToast('success', `✓ Permission granted! Transaction: ${txHash.slice(0, 10)}...`, 5000);
+
+      // Reload permission status
+      await loadPermissionStatus();
+    } catch (error: any) {
+      console.error('Error granting permission:', error);
+      showToast('error', `Failed: ${error.message || 'Transaction rejected'}`, 4000);
+    } finally {
       setLoading(false);
-      showToast('success', `✓ Permission granted! Spending cap: $${spendingCap} for ${duration} days`, 4000);
-    }, 1500);
+    }
   };
 
   const handleRevoke = async () => {
-    setLoading(true);
-    showToast('info', '🗑️ Revoking permission...', 2000);
+    try {
+      setLoading(true);
+      showToast('info', '🗑️ Revoking permission... Check MetaMask!', 3000);
 
-    setTimeout(() => {
+      await smartAccountManager.connect();
+      const txHash = await smartAccountManager.revokePermission();
+
       setPermissionStatus(null);
+      showToast('success', `✓ Permission revoked! Transaction: ${txHash.slice(0, 10)}...`, 5000);
+    } catch (error: any) {
+      console.error('Error revoking permission:', error);
+      showToast('error', `Failed: ${error.message || 'Transaction rejected'}`, 4000);
+    } finally {
       setLoading(false);
-      showToast('success', '✓ Permission revoked successfully', 3000);
-    }, 1500);
+    }
   };
 
   const handleTogglePause = async () => {
-    setLoading(true);
-    const newPauseState = !isPaused;
-    showToast('info', `${newPauseState ? '⏸️ Pausing' : '▶️ Resuming'} automation...`, 2000);
+    try {
+      setLoading(true);
+      const newPauseState = !isPaused;
+      showToast('info', `${newPauseState ? '⏸️ Pausing' : '▶️ Resuming'} automation... Check MetaMask!`, 3000);
 
-    setTimeout(() => {
+      await smartAccountManager.connect();
+      const txHash = await smartAccountManager.togglePause(newPauseState);
+
       setIsPaused(newPauseState);
       setPermissionStatus({ ...permissionStatus, isPaused: newPauseState });
+      showToast('success', `✓ Automation ${newPauseState ? 'paused' : 'resumed'}! Transaction: ${txHash.slice(0, 10)}...`, 5000);
+    } catch (error: any) {
+      console.error('Error toggling pause:', error);
+      showToast('error', `Failed: ${error.message || 'Transaction rejected'}`, 4000);
+    } finally {
       setLoading(false);
-      showToast('success', `✓ Automation ${newPauseState ? 'paused' : 'resumed'}`, 3000);
-    }, 1500);
+    }
   };
 
   const calculateTimeRemaining = () => {
@@ -96,8 +130,8 @@ const PermissionManager: React.FC = () => {
         </h2>
         {hasPermission && (
           <div className={`px-4 py-2 rounded-xl text-sm font-bold shadow-md ${isPaused
-              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
-              : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 animate-pulse-slow'
+            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
+            : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 animate-pulse-slow'
             }`}>
             {isPaused ? '⏸️ Paused' : '✓ Active'}
           </div>
