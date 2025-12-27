@@ -4,6 +4,20 @@ type UserConfig {
   spendingCap: BigInt!
   slippageLimit: BigInt!
   isPaused: Boolean!
+  hasActivePermission: Boolean!
+  permissionExpiry: BigInt!
+  lastUpdated: Int!
+}
+
+type PermissionEvent {
+  id: ID!
+  user: Bytes!
+  eventType: String! # GRANTED, REVOKED, PAUSED, RESUMED
+  amount: BigInt
+  expiry: BigInt
+  timestamp: Int!
+  blockNumber: Int!
+  transactionHash: Bytes!
 }
 
 type RebalanceAction {
@@ -13,6 +27,38 @@ type RebalanceAction {
   tokenOut: Bytes!
   amountIn: BigInt!
   amountOut: BigInt!
+  gasUsed: BigInt!
   blockNumber: Int!
   timestamp: Int!
+  transactionHash: Bytes!
 }
+
+type PortfolioBalance {
+  id: ID!
+  user: Bytes!
+  tokenAddress: Bytes!
+  tokenSymbol: String!
+  balance: BigInt!
+  valueUSD: BigInt!
+  timestamp: Int!
+}
+
+type GasAnalytics {
+  id: ID!
+  user: Bytes!
+  totalRebalances: Int!
+  totalGasUsed: BigInt!
+  averageGasPerRebalance: BigInt!
+  estimatedSavingsUSD: BigInt!
+  lastUpdated: Int!
+}
+
+type DailyStats {
+  id: ID!
+  date: String! # YYYY-MM-DD
+  totalRebalances: Int!
+  totalGasUsed: BigInt!
+  uniqueUsers: Int!
+  totalVolumeUSD: BigInt!
+}
+

@@ -1,0 +1,21 @@
+name: autopilot-defi
+description: AutoPilot DeFi Indexer
+networks:
+  - id: 11155111
+    name: sepolia
+    rpc_config:
+      url: https://ethereum-sepolia-rpc.publicnode.com
+    start_block: 7000000
+    contracts:
+      - name: AutoPilotDeFi
+        address: "0x0000000000000000000000000000000000000000"
+        abi_file_path: ./abis/AutoPilotDeFi.json
+        handler: ./src/EventHandlers.ts
+        events:
+          - event: PermissionGranted(address indexed user, uint256 spendingCap, uint256 expiry, uint256 timestamp)
+          - event: PermissionRevoked(address indexed user, uint256 timestamp)
+          - event: PermissionUsed(address indexed user, uint256 amount, uint256 remaining)
+          - event: Rebalanced(address indexed user, address tokenIn, address tokenOut, uint256 amountIn, uint256 amountOut, uint256 gasUsed, uint256 timestamp)
+          - event: ConfigUpdated(address indexed user, uint256 slippageLimit)
+          - event: Paused(address indexed user)
+          - event: Unpaused(address indexed user)

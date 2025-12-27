@@ -1,0 +1,53 @@
+type Permission @entity {
+  id: ID!
+  user: Bytes!
+  spendingCap: BigInt!
+  spent: BigInt!
+  expiry: BigInt!
+  active: Boolean!
+  grantedAt: BigInt!
+  revokedAt: BigInt
+  timestamp: BigInt!
+}
+
+type PermissionEvent @entity {
+  id: ID!
+  user: Bytes!
+  eventType: String!
+  amount: BigInt
+  remaining: BigInt
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+}
+
+type Rebalance @entity {
+  id: ID!
+  user: Bytes!
+  tokenIn: Bytes!
+  tokenOut: Bytes!
+  amountIn: BigInt!
+  amountOut: BigInt!
+  gasUsed: BigInt!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  transactionHash: Bytes!
+}
+
+type UserStats @entity {
+  id: ID!
+  user: Bytes!
+  totalRebalances: Int!
+  totalGasUsed: BigInt!
+  totalSpent: BigInt!
+  lastRebalance: BigInt
+}
+
+type DailyMetrics @entity {
+  id: ID!
+  date: String!
+  totalRebalances: Int!
+  totalGasUsed: BigInt!
+  uniqueUsers: Int!
+  totalVolume: BigInt!
+}
