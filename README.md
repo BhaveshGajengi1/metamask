@@ -228,7 +228,7 @@ Visit `http://localhost:5173` 🎉
 
 ## 🔗 Links
 
-- **Live Demo**: [Coming Soon]
+- **Live Demo**: https://frontend-1awu81t33-bhavesh-gajengis-projects.vercel.app
 - **Video Demo**: [Coming Soon]
 - **Sepolia Contract**: [Update after deployment]
 - **Envio Dashboard**: [Update after deployment]
