@@ -1,4 +1,4 @@
-import { BrowserProvider, Contract, parseUnits } from 'ethers';
+import { Contract, parseUnits, type Signer } from 'ethers';
 
 const CONTRACT_ABI = [
     "function grantPermission(uint256 _spendingCap, uint256 _durationDays) external",
@@ -13,6 +13,8 @@ const CONTRACT_ABI = [
 
 const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || "0x0000000000000000000000000000000000000000";
 
+console.log('Contract Address:', CONTRACT_ADDRESS);
+
 export interface SmartAccountPermission {
     spendingCap: bigint;
     spent: bigint;
@@ -22,36 +24,35 @@ export interface SmartAccountPermission {
 }
 
 export class SmartAccountManager {
-    private provider: BrowserProvider | null = null;
     private contract: Contract | null = null;
 
-    async connect() {
-        if (!window.ethereum) {
-            throw new Error("MetaMask not installed");
+    // Initialize with signer from WalletContext
+    initialize(signer: Signer) {
+        if (!signer) {
+            throw new Error("Signer is required");
         }
-
-        this.provider = new BrowserProvider(window.ethereum);
-        await this.provider.send("eth_requestAccounts", []);
-
-        const signer = await this.provider.getSigner();
         this.contract = new Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-
-        return signer.getAddress();
+        console.log('SmartAccountManager initialized with contract:', CONTRACT_ADDRESS);
     }
 
     async grantPermission(spendingCapUSD: number, durationDays: number): Promise<string> {
-        if (!this.contract) throw new Error("Not connected");
+        if (!this.contract) throw new Error("Not initialized. Please connect wallet first.");
 
         const spendingCap = parseUnits(spendingCapUSD.toString(), 6); // USDC has 6 decimals
 
+        console.log('Granting permission:', { spendingCapUSD, durationDays, spendingCap: spendingCap.toString() });
+
         const tx = await this.contract.grantPermission(spendingCap, durationDays);
+        console.log('Transaction sent:', tx.hash);
+
         const receipt = await tx.wait();
+        console.log('Transaction confirmed:', receipt.hash);
 
         return receipt.hash;
     }
 
     async revokePermission(): Promise<string> {
-        if (!this.contract) throw new Error("Not connected");
+        if (!this.contract) throw new Error("Not initialized. Please connect wallet first.");
 
         const tx = await this.contract.revokePermission();
         const receipt = await tx.wait();
@@ -60,7 +61,7 @@ export class SmartAccountManager {
     }
 
     async getPermission(address: string): Promise<SmartAccountPermission> {
-        if (!this.contract) throw new Error("Not connected");
+        if (!this.contract) throw new Error("Not initialized. Please connect wallet first.");
 
         const result = await this.contract.getPermission(address);
 
@@ -74,7 +75,7 @@ export class SmartAccountManager {
     }
 
     async setSlippage(slippageBps: number): Promise<string> {
-        if (!this.contract) throw new Error("Not connected");
+        if (!this.contract) throw new Error("Not initialized. Please connect wallet first.");
 
         const tx = await this.contract.setConfig(slippageBps);
         const receipt = await tx.wait();
@@ -83,7 +84,7 @@ export class SmartAccountManager {
     }
 
     async togglePause(pause: boolean): Promise<string> {
-        if (!this.contract) throw new Error("Not connected");
+        if (!this.contract) throw new Error("Not initialized. Please connect wallet first.");
 
         const tx = await this.contract.togglePause(pause);
         const receipt = await tx.wait();
@@ -105,3 +106,4 @@ export class SmartAccountManager {
 }
 
 export const smartAccountManager = new SmartAccountManager();
+

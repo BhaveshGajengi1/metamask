@@ -4,7 +4,7 @@ import { useToast } from './ToastContainer';
 import { smartAccountManager } from '../lib/smartAccount';
 
 const PermissionManager: React.FC = () => {
-  const { userAddress, provider } = useWallet();
+  const { userAddress, signer } = useWallet();
   const { showToast } = useToast();
 
   const [spendingCap, setSpendingCap] = useState(5000);
@@ -14,14 +14,19 @@ const PermissionManager: React.FC = () => {
   const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
-    if (userAddress) {
+    if (userAddress && signer) {
       loadPermissionStatus();
     }
-  }, [userAddress]);
+  }, [userAddress, signer]);
 
   const loadPermissionStatus = async () => {
     try {
-      await smartAccountManager.connect();
+      if (!signer) {
+        console.log('No signer available');
+        return;
+      }
+
+      smartAccountManager.initialize(signer);
       const permission = await smartAccountManager.getPermission(userAddress!);
 
       if (permission.active) {
@@ -40,11 +45,16 @@ const PermissionManager: React.FC = () => {
   };
 
   const handleGrant = async () => {
+    if (!signer) {
+      showToast('error', 'Please connect your wallet first!', 3000);
+      return;
+    }
+
     try {
       setLoading(true);
       showToast('info', '🔐 Requesting permission... Check MetaMask!', 3000);
 
-      await smartAccountManager.connect();
+      smartAccountManager.initialize(signer);
       const txHash = await smartAccountManager.grantPermission(spendingCap, duration);
 
       showToast('success', `✓ Permission granted! Transaction: ${txHash.slice(0, 10)}...`, 5000);
@@ -60,11 +70,16 @@ const PermissionManager: React.FC = () => {
   };
 
   const handleRevoke = async () => {
+    if (!signer) {
+      showToast('error', 'Please connect your wallet first!', 3000);
+      return;
+    }
+
     try {
       setLoading(true);
       showToast('info', '🗑️ Revoking permission... Check MetaMask!', 3000);
 
-      await smartAccountManager.connect();
+      smartAccountManager.initialize(signer);
       const txHash = await smartAccountManager.revokePermission();
 
       setPermissionStatus(null);
@@ -78,12 +93,17 @@ const PermissionManager: React.FC = () => {
   };
 
   const handleTogglePause = async () => {
+    if (!signer) {
+      showToast('error', 'Please connect your wallet first!', 3000);
+      return;
+    }
+
     try {
       setLoading(true);
       const newPauseState = !isPaused;
       showToast('info', `${newPauseState ? '⏸️ Pausing' : '▶️ Resuming'} automation... Check MetaMask!`, 3000);
 
-      await smartAccountManager.connect();
+      smartAccountManager.initialize(signer);
       const txHash = await smartAccountManager.togglePause(newPauseState);
 
       setIsPaused(newPauseState);
