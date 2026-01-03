@@ -16,7 +16,7 @@ AutoPilot DeFi is a next-generation DeFi automation platform that leverages **Me
 - ✅ **Real-time Analytics** - Powered by Envio blockchain indexing
 - ✅ **Gas Optimization** - Save up to 30% on transaction costs
 
-## 🏆 Hackathon Features
+## 🏆 Special Features
 
 ### 1. MetaMask Advanced Permissions (ERC-7715)
 - Replaces unlimited ERC-20 approvals with granular permissions
@@ -215,8 +215,6 @@ Visit `http://localhost:5173` 🎉
 - [Smart Contract](./contracts/AutoPilot.sol) - Contract source code
 - [Envio Schema](./indexing/schema.graphql) - GraphQL schema
 
-## 🏅 Hackathon Submission
-
 **Track**: Best Integration of MetaMask Advanced Permissions
 
 **Highlights**:
@@ -228,7 +226,7 @@ Visit `http://localhost:5173` 🎉
 
 ## 🔗 Links
 
-- **Live Demo**: https://frontend-nkis74ltl-bhavesh-gajengis-projects.vercel.app
+- **Live Demo**: https://frontend-delta-opal-78.vercel.app/
 - **Backend API**: https://autopilot-defi-backend.onrender.com
 - **Smart Contract (Sepolia)**: 0xb94973f423B6De40Cf4Df9344eD291D41C79194e
 - **Etherscan**: https://sepolia.etherscan.io/address/0xb94973f423B6De40Cf4Df9344eD291D41C79194e
@@ -236,7 +234,7 @@ Visit `http://localhost:5173` 🎉
 
 ## 👥 Team
 
-Built with ❤️ for the MetaMask Advanced Permissions Hackathon
+Built with ❤️ for the MetaMask
 
 ## 📄 License
 
