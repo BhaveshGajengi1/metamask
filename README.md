@@ -1,4 +1,4 @@
-# 🚀 AutoPilot DeFi - MetaMask Advanced Permissions Hackathon
+# 🚀 AutoPilot DeFi - MetaMask
 
 > Automated portfolio rebalancing with MetaMask Advanced Permissions (ERC-7715) + Envio blockchain indexing
 
